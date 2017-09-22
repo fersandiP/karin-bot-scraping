@@ -9,7 +9,6 @@ class Config(object):
 		{
 			'id': 'generate-page',
 			'func': 'func:scrap',
-			'args': (1, 2),
 			'trigger': 'interval',
 			'minutes': 1
 		}
