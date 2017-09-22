@@ -14,7 +14,7 @@ def scrap():
 	if (val is None):
 		r.set("test", 0)
 	else:
-		r.set("test", val+1)
+		r.set("test", int(val)+1)
 
 def test():
 	r = login_redis()
