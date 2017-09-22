@@ -3,6 +3,7 @@ import func
 from flask import Flask
 from flask_apscheduler import APScheduler
 
+app = Flask(__name__)
 
 class Config(object):
 	JOBS = [
@@ -16,7 +17,6 @@ class Config(object):
 
 	SCHEDULER_API_ENABLED = True
 
-app = Flask(__name__)
 
 @app.route('/')
 def main():
@@ -35,8 +35,9 @@ if __name__ == "__main__":
 
 	scheduler = APScheduler()
 	# it is also possible to enable the API directly
-	# scheduler.api_enabled = True
-	scheduler.init_app(app)
+	scheduler.api_enabled = True
+	# scheduler.init_app(app)
+	scheduler.add_job(test_job, 'interval', minutes=1)
 	scheduler.start()
 	
 	app.run(host='0.0.0.0', port=int(port))
