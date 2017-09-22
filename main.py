@@ -37,7 +37,7 @@ if __name__ == "__main__":
 	# it is also possible to enable the API directly
 	scheduler.api_enabled = True
 	# scheduler.init_app(app)
-	scheduler.add_job(test_job, 'interval', minutes=1)
+	scheduler.add_job("test", test_job, 'interval', minutes=1)
 	scheduler.start()
 	
 	app.run(host='0.0.0.0', port=int(port))
