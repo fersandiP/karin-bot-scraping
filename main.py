@@ -8,7 +8,7 @@ class Config(object):
 	JOBS = [
 		{
 			'id': 'generate-page',
-			'func': 'func:scrap',
+			'func': 'test_job',
 			'trigger': 'interval',
 			'minutes': 1
 		}
@@ -25,6 +25,9 @@ def main():
 @app.route('/test')
 def test():
 	return func.test()
+
+def test_job():
+	func.scrap()
 
 port = os.getenv('VCAP_APP_PORT', '5000')
 if __name__ == "__main__":
