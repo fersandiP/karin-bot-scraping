@@ -10,16 +10,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def main():
-	app.logger.debug("DOO")
 	return "Bot is running"
-
-@app.route('/test')
-def test():
-	return func.test()
 
 def test_job():
 	app.logger.debug('test')
-	func.scrap()
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(
