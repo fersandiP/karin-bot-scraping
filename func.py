@@ -274,16 +274,17 @@ def import_json(json_data):
 def export_insurance_data(insurance):
 	data = None
 	try:
-		data = json.decode(r.get(insurance))
+		data = json.loads(r.get(insurance).decode("utf-8"))
+		data = data['root']
 	except:
 		return 'insurance has no valid data stored'
 
-	return {
+	return json.dumps({
 		'name' : data['name'],
 		'tagline' : data['tagline'],
 		'description' : data['description'],
 		'billing' : data['billing']
-	}
+	})
 
 # def get_packages_list(insurance):
 # 	_packages_key = insurance+'__packages'
@@ -293,11 +294,12 @@ def export_insurance_data(insurance):
 def export_packages_list(insurance):
 	data = None
 	try:
-		data = json.decode(r.get(insurance))
+		data = json.loads(r.get(insurance).decode("utf-8"))
+		data = data['root']
 	except:
 		return 'insurance has no valid data stored'
 
-	return {'packages' : data['packages']}
+	return json.dumps({'packages' : data['packages']})
 
 
 # def get_package_data(insurance,package):
@@ -322,7 +324,8 @@ def export_packages_list(insurance):
 def export_package_data(insurance, package):
 	data = None
 	try:
-		data = json.decode(r.get(insurance))
+		data = json.loads(r.get(insurance).decode("utf-8"))
+		data = data['root']
 	except:
 		return 'insurance has no valid data stored'
 
@@ -332,4 +335,4 @@ def export_package_data(insurance, package):
 	except:
 		return 'insurance has no such package'
 
-	return {package, package_data}
+	return json.dumps({package : package_data})
