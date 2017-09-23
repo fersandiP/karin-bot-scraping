@@ -88,14 +88,18 @@ class FwdSpider(scrapy.Spider):
 		r.set(name, json.dumps(data))
 
 def api(name):
-	if name is None or name == '':
+	global r
+	if name is None or name == '' or name == 'all':
 		return json.dumps(category_list)
 
 	if name in category_list:
-		return json.dumps(r.lrange(name, 0,-1).decode("utf-8"))
+		lst = r.lrange(name, 0, -1)
+		for i in range(len(lst)):
+			lst[i] = lst[i].decode('utf-8')
+		return json.dumps(lst)
 
 	if r.get(name) is None:
-		return API Invalid
+		return "API Invalid"
 	else :
 		return json.dumps(r.get(name).decode("utf-8"))
 
@@ -107,3 +111,5 @@ def _scrap():
 
 	process.crawl(FwdSpider)
 	process.start() # the script will block here until the crawling is finished
+	# process.join()
+	# process.stop()

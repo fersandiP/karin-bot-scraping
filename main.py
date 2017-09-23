@@ -12,17 +12,21 @@ app = Flask(__name__)
 def main():
 	return "Bot is running"
 
+@app.route('/api/')
+def api_default():
+	return func.api("all")
+
 @app.route('/api/<paket>')
 def api(paket):
 	return func.api(paket)
 
 def test_job():
-	app.logger.debug('test')
+	func._scrap()
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(
-	func=test_job,
-	trigger=IntervalTrigger(seconds=5),
+	func=func._scrap,
+	trigger=IntervalTrigger(minutes=15),
 	id='printing_job',
 	name='Print date and time every five seconds',
 	replace_existing=True)
