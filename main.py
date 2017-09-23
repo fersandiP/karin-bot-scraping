@@ -23,17 +23,17 @@ def api(paket):
 def test_job():
 	func._scrap()
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(
-	func=func._scrap,
-	trigger=IntervalTrigger(minutes=15),
-	id='printing_job',
-	name='Print date and time every five seconds',
-	replace_existing=True)
-scheduler.start()
+# scheduler = BackgroundScheduler()
+# scheduler.add_job(
+# 	func=test_job,
+# 	trigger=IntervalTrigger(minutes=15),
+# 	id='printing_job',
+# 	name='Print date and time every five seconds',
+# 	replace_existing=True)
+# scheduler.start()
 
 # Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
+# atexit.register(lambda: scheduler.shutdown())
 
 port = os.getenv('VCAP_APP_PORT', '5000')
 if __name__ == "__main__":
