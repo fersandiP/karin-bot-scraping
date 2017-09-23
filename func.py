@@ -10,7 +10,7 @@ REDIS_PORT = 17556
 REDIS_PASSWORD = "BWJPNBCYZAZCAVPD"
 
 category_list = ['invest', 'accident-disability', 'critical-illness',
- 'hospitalisation', 'life', 'waiver-of-premium']
+ 'hospitalisation', 'life', 'waiver-of-premium', 'package']
 
 def login_redis():
 	return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD)
@@ -26,7 +26,7 @@ class FwdSpider(scrapy.Spider):
 		"https://www.fwd.co.id/id/protect/critical-illness/",
 		"https://www.fwd.co.id/id/protect/hospitalisation/",
 		"https://www.fwd.co.id/id/protect/life/",
-		"https://www.fwd.co.id/id/protect/waiver-of-premium/"
+		"https://www.fwd.co.id/id/protect/waiver-of-premium/",
 		"https://www.fwd.co.id/id/protect/package/"
 	]
 
@@ -47,7 +47,7 @@ class FwdSpider(scrapy.Spider):
 
 		link = response.url
 		name = link.split("/")[-2]
-		description = response.css(".table-cell > p::text").extract_first()
+		description = response.css(".table-cell > p::text").extract_first().replace("\xa0", "").replace("\\u00a0", "")
 
 		features = []
 		feature = response.css(".tell-me-more .content")
@@ -60,14 +60,18 @@ class FwdSpider(scrapy.Spider):
 		for i in range(len(features)):
 			features[i] = features[i].strip()
 			if features[i] != '':
-				features[i] = features[i].replace("\xa0", "")
+				features[i] = features[i].replace("\xa0", "").replace("\\u00a0", "")
 				new_features += [features[i]]
 		features = new_features
 
 		advantages = response.css(".product-feature p::text").extract()
 		advantages += response.css(".product-feature li::text").extract()
+		new_advantages = []
 		for i in range(len(advantages)):
 			advantages[i] = advantages[i].strip()
+			if advantages[i] != '':
+				new_advantages += [advantages[i].replace("\xa0", "").replace("\\u00a0", "")]
+		advantages = new_advantages
 
 		brosur = response.css(".panel-download option::attr(value)").extract()
 		brosur_link = None
