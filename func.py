@@ -168,9 +168,8 @@ def _scrap():
 	# process.join()
 	process.stop()
 
-def import_data(request):
+def import_data(json_file):
 	global r
-	json_file = request.data['json']
 	data = json.loads(json_file)
 
 	insurance = data['root']
@@ -179,12 +178,12 @@ def import_data(request):
 	tagline = insurance['tagline']
 	description = insurance['description']
 	billing = insurance['billing']
-	packages = insurance['paket']
+	packages = insurance['packages']
 
-	_billing_key = insurance+'__billing'
-	_tagline_key = insurance+'__tagline'
-	_description_key = insurance+'__description'
-	_packages_key = insurance+'__packages'
+	_billing_key = name+'__billing'
+	_tagline_key = name+'__tagline'
+	_description_key = name+'__description'
+	_packages_key = name+'__packages'
 
 	r.set(name, name)
 	r.set(_billing_key, billing)
@@ -200,7 +199,7 @@ def import_data(request):
 		payment = package['payment-options']
 		fees = package['fees']
 
-		_package_name_key = _package_key+'__'+name
+		_package_name_key = _packages_key+'__'+name
 		_package_features_key = _package_name_key+'__features'
 		_package_coverage_key = _package_name_key+'__coverage'
 		_package_riskclass_key = _package_name_key+'__risk-class'
@@ -215,36 +214,122 @@ def import_data(request):
 
 	return json.dumps(data)
 
-def get_insurance_data(insurance):
-	_tagline_key = insurance+'__tagline'
-	_description_key = insurance+'__description'
+def import_json(json_data):
+	data = None
+	try:
+		data = json.loads(json_data)
+	except:
+		return 'data must be raw json file'
+
+	try:
+		root = data['root']
+
+		name = root['name']
+		tagline = root['tagline']
+		description = root['description']
+		billing = root['billing']
+		packages = root['packages']
+
+		assert type(name) == str
+		assert type(tagline) == str
+		assert type(description) == str
+		assert type(billing) == str
+		assert type(packages) == dict
+
+		for package_key in packages:
+			package = packages[package_key]
+
+			name = package['name']
+			features = package['features']
+			coverage = package['coverage']
+			riskclass = package['risk-class']
+			payment = package['payment-options']
+			fees = package['fees']
+
+			assert type(name) == str
+			assert type(features) == list
+			assert type(coverage) == list
+			assert type(riskclass) == list
+			assert type(payment) == list
+			assert type(name) == str
+	except:
+		return 'data structure incorrect'
+
+	insurance = data['root']['name'].replace(' ','_')
+
+	r.set(insurance, json.dumps(data));
+
+	return insurance+'\n' + str(r.get(insurance))
+
+# def get_insurance_data(insurance):
+# 	_tagline_key = insurance+'__tagline'
+# 	_description_key = insurance+'__description'
+
+# 	return {
+# 		'name' : insurance,
+# 		'tagline' : r.get(_tagline_key),
+# 		'description' : r.get(_description_key)
+# 	}
+
+def export_insurance_data(insurance):
+	data = None
+	try:
+		data = json.decode(r.get(insurance))
+	except:
+		return 'insurance has no valid data stored'
 
 	return {
-		'name' : insurance,
-		'tagline' : r.get(_tagline_key),
-		'description' : r.get(_description_key)
+		'name' : data['name'],
+		'tagline' : data['tagline'],
+		'description' : data['description'],
+		'billing' : data['billing']
 	}
 
-def get_packages_list(insurance):
-	_packages_key = insurance+'__packages'
+# def get_packages_list(insurance):
+# 	_packages_key = insurance+'__packages'
 
-	return r.get(_packages_key)
+# 	return r.get(_packages_key)
 
-def get_package_data(insurance,package):
-	_packages_key = insurance+'__packages'
+def export_packages_list(insurance):
+	data = None
+	try:
+		data = json.decode(r.get(insurance))
+	except:
+		return 'insurance has no valid data stored'
+
+	return {'packages' : data['packages']}
+
+
+# def get_package_data(insurance,package):
+# 	_packages_key = insurance+'__packages'
 	
-	_package_name_key = _package_key+'__'+package
-	_package_features_key = _package_name_key+'__features'
-	_package_coverage_key = _package_name_key+'__coverage'
-	_package_riskclass_key = _package_name_key+'__risk-class'
-	_package_payment_key = _package_name_key+'__payment-options'
-	_package_fees_key = _package_name_key+'__fees'
+# 	_package_name_key = _package_key+'__'+package
+# 	_package_features_key = _package_name_key+'__features'
+# 	_package_coverage_key = _package_name_key+'__coverage'
+# 	_package_riskclass_key = _package_name_key+'__risk-class'
+# 	_package_payment_key = _package_name_key+'__payment-options'
+# 	_package_fees_key = _package_name_key+'__fees'
 
-	return {
-		'name' : package,
-		'features' : r.get(_package_features_key),
-		'coverage' : r.get(_package_coverage_key),
-		'risk-class' : r.get(_package_riskclass_key),
-		'payment-options' : r.get(_package_payment_key),
-		'fees' : r.get(_package_fees_key)
-	}
+# 	return {
+# 		'name' : package,
+# 		'features' : r.get(_package_features_key),
+# 		'coverage' : r.get(_package_coverage_key),
+# 		'risk-class' : r.get(_package_riskclass_key),
+# 		'payment-options' : r.get(_package_payment_key),
+# 		'fees' : r.get(_package_fees_key)
+# 	}
+
+def export_package_data(insurance, package):
+	data = None
+	try:
+		data = json.decode(r.get(insurance))
+	except:
+		return 'insurance has no valid data stored'
+
+	package_data = None
+	try:
+		package_data = data['packages'][package]
+	except:
+		return 'insurance has no such package'
+
+	return {package, package_data}

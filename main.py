@@ -1,6 +1,6 @@
 import os
 import func
-from flask import Flask
+from flask import Flask, request
 import atexit
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -34,19 +34,22 @@ def update_user():
 
 @app.route('/json-data', methods=['POST'])
 def json_data():
-	return func.input_data(request)
+	# return func.import_data(request.data)
+	return func.import_json(request.data)
 
 @app.route('/data/<insurance>')
 def json_insurance_data(insurance):
-	return func.get_insurance_data(insurance)
+	app.logger.debug('insurance '+insurance)
+	return func.export_insurance_data(insurance)
 
 @app.route('/data/<insurance>/packages')
 def json_insurance_packages(insurance):
-	return func.get_packages_list(insurance)
+	app.logger.debug('packages '+insurance)
+	return func.export_packages_list(insurance)
 
 @app.route('/data/<insurance>/<package>')
 def json_insurance_package_data(insurance,package):
-	return func.get_package_data(insurance,package)
+	return func.export_package_data(insurance,package)
 
 def test_job():
 	func._scrap()

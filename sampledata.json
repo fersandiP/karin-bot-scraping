@@ -1,0 +1,26 @@
+{
+	"root" : {
+		"name" : "nama asuransi",
+		"tagline" : "tagline asuransi",
+		"description" : "deskripsi singkat asuransi",
+		"billing" : "billing options",
+		"packages" : {
+			"paket_a" : {
+				"name" : "paket a",
+				"features" : ["fitur a1", "fitur a2", "fitur a3"],
+				"coverage" : ["coverage gol a1"],
+				"risk-class" : ["risk a1", "risk a2"],
+				"payment-options" : ["pembayaran a bulanan", "pembayan a tahunan"],
+				"fees" : "biaya tambahan a"
+			},
+			"paket_b" : {
+				"name" : "paket b",
+				"features" : ["fitur b1", "fitur b2"],
+				"coverage" : ["coverage gol b1", "coverage gol b1"],
+				"risk-class" : ["risk b1", "risk b2", "risk b3"],
+				"payment-options" : ["pembayaran b harian", "pembayan b mingguan"],
+				"fees" : "biaya tambahan b"
+			}
+		}
+	}
+}
