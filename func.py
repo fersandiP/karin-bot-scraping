@@ -1,6 +1,7 @@
 import redis
 import scrapy
 import json
+import base64
 from scrapy.crawler import CrawlerProcess
 
 
@@ -101,7 +102,35 @@ def api(name):
 	if r.get(name) is None:
 		return "API Invalid"
 	else :
-		return json.dumps(r.get(name).decode("utf-8"))
+		return r.get(name).decode("utf-8")
+
+def add_user(request):
+	user_id = r.get(request.data["id"]) 
+	if (user_id is not None):
+		return "User has been registered"
+
+	info = {}
+
+	for key,value in request.data:
+		if (key == "id"):
+			continue
+		info[key] = value
+
+	for key,value in request.files:
+		info[key] = base64.b64encode(value.read())
+
+	info = json.dumps(info)
+
+	r.set(user_id, info)
+
+	return "success"
+
+def get_user(user_id):
+	data = r.get(user_id)
+	if (data is None):
+		return "User not found"
+
+	return data.decode("utf-8")
 
 def _scrap():
 	r.flushall()
