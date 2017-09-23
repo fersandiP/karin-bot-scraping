@@ -12,6 +12,10 @@ app = Flask(__name__)
 def main():
 	return "Bot is running"
 
+@app.route('/api/<paket>')
+def api(paket):
+	return func.api(paket)
+
 def test_job():
 	app.logger.debug('test')
 

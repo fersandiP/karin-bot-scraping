@@ -8,6 +8,9 @@ REDIS_HOST = "sl-aus-syd-1-portal.3.dblayer.com"
 REDIS_PORT = 17556
 REDIS_PASSWORD = "BWJPNBCYZAZCAVPD"
 
+category_list = ['invest', 'accident-disability', 'critical-illness',
+ 'hospitalisation', 'life', 'waiver-of-premium']
+
 def login_redis():
 	return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD)
 
@@ -84,7 +87,20 @@ class FwdSpider(scrapy.Spider):
 		global r
 		r.set(name, json.dumps(data))
 
+def api(name):
+	if name is None or name == '':
+		return json.dumps(category_list)
+
+	if name in category_list:
+		return json.dumps(r.lrange(name, 0,-1).decode("utf-8"))
+
+	if r.get(name) is None:
+		return API Invalid
+	else :
+		return json.dumps(r.get(name).decode("utf-8"))
+
 def _scrap():
+	r.flushall()
 	process = CrawlerProcess({
 		'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
 	})
