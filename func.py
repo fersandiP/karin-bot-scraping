@@ -27,11 +27,15 @@ class FwdSpider(scrapy.Spider):
 		"https://www.fwd.co.id/id/protect/hospitalisation/",
 		"https://www.fwd.co.id/id/protect/life/",
 		"https://www.fwd.co.id/id/protect/waiver-of-premium/"
+		"https://www.fwd.co.id/id/protect/package/"
 	]
-	r = login_redis()
 
 	def parse(self, response):
-		links = response.css(".product-filter-pane .click-here a.btn")
+		if response.url == "https://www.fwd.co.id/id/protect/package/":
+			links = response.css(".invest-reason a.btn")
+		else:
+			links = response.css(".product-filter-pane .click-here a.btn")
+			
 		jenis = response.url.split('/')[-2]
 		for a in links.css("a::attr(href)"):
 			self._save_list(jenis, a.get().split('/')[-1])
@@ -46,11 +50,11 @@ class FwdSpider(scrapy.Spider):
 		description = response.css(".table-cell > p::text").extract_first()
 
 		features = []
-		feature = response.css(".content")
+		feature = response.css(".tell-me-more .content")
 		feature = feature.css("p::text").extract_first()
 		if (feature is not None):
 			features += [feature]
-		features += response.css(".content ul li::text").extract()
+		features += response.css(".tell-me-more .content ul li::text").extract()
 
 		new_features = []
 		for i in range(len(features)):
@@ -60,7 +64,8 @@ class FwdSpider(scrapy.Spider):
 				new_features += [features[i]]
 		features = new_features
 
-		advantages = response.css(".product-list p::text").extract()
+		advantages = response.css(".product-feature p::text").extract()
+		advantages += response.css(".product-feature li::text").extract()
 		for i in range(len(advantages)):
 			advantages[i] = advantages[i].strip()
 
@@ -131,6 +136,22 @@ def get_user(user_id):
 		return "User not found"
 
 	return data.decode("utf-8")
+
+def update_user(request):
+	data = r.get(request.data['id'])
+	if (data is None):
+		return "User not found"
+	data = json.loads(data)
+
+	for key,value in request.data:
+		if (key == "id"):
+			continue
+		data[key] = value
+
+	for key,value in request.files:
+		data[key] = base64.b64encode(value.read())
+
+	return "success"
 
 def _scrap():
 	r.flushall()

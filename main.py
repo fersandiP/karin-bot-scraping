@@ -28,6 +28,10 @@ def insert_user():
 def get_user(user_id):
 	return func.get_user(user_id)
 
+@app.route('/user/update')
+def update_user():
+	return func.update_user(request)
+
 def test_job():
 	func._scrap()
 
