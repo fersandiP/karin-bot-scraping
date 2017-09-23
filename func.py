@@ -167,3 +167,84 @@ def _scrap():
 	process.start() # the script will block here until the crawling is finished
 	# process.join()
 	process.stop()
+
+def import_data(request):
+	global r
+	json_file = request.data['json']
+	data = json.loads(json_file)
+
+	insurance = data['root']
+
+	name = insurance['name']
+	tagline = insurance['tagline']
+	description = insurance['description']
+	billing = insurance['billing']
+	packages = insurance['paket']
+
+	_billing_key = insurance+'__billing'
+	_tagline_key = insurance+'__tagline'
+	_description_key = insurance+'__description'
+	_packages_key = insurance+'__packages'
+
+	r.set(name, name)
+	r.set(_billing_key, billing)
+	r.set(_tagline_key, tagline)
+	r.set(_description_key, description)
+	r.set(_packages_key, packages)
+
+	for package in packages:
+		name = package['name']
+		features = package['features']
+		coverage = package['coverage']
+		riskclass = package['risk-class']
+		payment = package['payment-options']
+		fees = package['fees']
+
+		_package_name_key = _package_key+'__'+name
+		_package_features_key = _package_name_key+'__features'
+		_package_coverage_key = _package_name_key+'__coverage'
+		_package_riskclass_key = _package_name_key+'__risk-class'
+		_package_payment_key = _package_name_key+'__payment-options'
+		_package_fees_key = _package_name_key+'__fees'
+
+		r.set(_package_features_key, features)
+		r.set(_package_coverage_key, coverage)
+		r.set(_package_riskclass_key, riskclass)
+		r.set(_package_payment_key, payment)
+		r.set(_package_fees_key, fees)
+
+	return json.dumps(data)
+
+def get_insurance_data(insurance):
+	_tagline_key = insurance+'__tagline'
+	_description_key = insurance+'__description'
+
+	return {
+		'name' : insurance,
+		'tagline' : r.get(_tagline_key),
+		'description' : r.get(_description_key)
+	}
+
+def get_packages_list(insurance):
+	_packages_key = insurance+'__packages'
+
+	return r.get(_packages_key)
+
+def get_package_data(insurance,package):
+	_packages_key = insurance+'__packages'
+	
+	_package_name_key = _package_key+'__'+package
+	_package_features_key = _package_name_key+'__features'
+	_package_coverage_key = _package_name_key+'__coverage'
+	_package_riskclass_key = _package_name_key+'__risk-class'
+	_package_payment_key = _package_name_key+'__payment-options'
+	_package_fees_key = _package_name_key+'__fees'
+
+	return {
+		'name' : package,
+		'features' : r.get(_package_features_key),
+		'coverage' : r.get(_package_coverage_key),
+		'risk-class' : r.get(_package_riskclass_key),
+		'payment-options' : r.get(_package_payment_key),
+		'fees' : r.get(_package_fees_key)
+	}

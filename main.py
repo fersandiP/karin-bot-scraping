@@ -32,6 +32,22 @@ def get_user(user_id):
 def update_user():
 	return func.update_user(request)
 
+@app.route('/json-data', methods=['POST'])
+def json_data():
+	return func.input_data(request)
+
+@app.route('/data/<insurance>')
+def json_insurance_data(insurance):
+	return func.get_insurance_data(insurance)
+
+@app.route('/data/<insurance>/packages')
+def json_insurance_packages(insurance):
+	return func.get_packages_list(insurance)
+
+@app.route('/data/<insurance>/<package>')
+def json_insurance_package_data(insurance,package):
+	return func.get_package_data(insurance,package)
+
 def test_job():
 	func._scrap()
 
