@@ -182,16 +182,16 @@ def suggest_package(user_id):
 	user = json.loads(user)
 
 	suggestion = {}
-    protect_package = api('family-term')['data']
-    invest_package = api('sprint-link-plus')['data']
-    promo_package = api('bebas-aksi')['data']
+	protect_package = api('family-term')['data']
+	invest_package = api('sprint-link-plus')['data']
+	promo_package = api('bebas-aksi')['data']
 	suggestion = {
 		'protect' : protect_package,
 		'invest' : invest_package,
 		'promo' : promo_package
 		}
-    if user['jobClass'] == 'pelajar' and user['<7JT']:
-        suggestion['education'] = api('sprint-education')['data']
+	if user['jobClass'] == 'pelajar' and user['<7JT']:
+		suggestion['education'] = api('sprint-education')['data']
 	return json.dumps(suggestion)
 
 def _scrap():
