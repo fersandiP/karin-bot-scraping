@@ -123,7 +123,7 @@ def api(name):
 	if r.get(name) is None:
 		return "API Invalid"
 	else :
-		return r.get(name).decode("utf-8")
+		return json.loads(r.get(name).decode("utf-8"))
 
 def add_user(request):
 	data = request.form
@@ -190,7 +190,7 @@ def suggest_package(user_id):
 		'invest' : invest_package,
 		'promo' : promo_package
 		}
-	if user['jobClass'] == 'pelajar' and user['<7JT']:
+	if user['jobClass'] == 'pelajar' and user['salaryClass'] == "<7JT":
 		suggestion['education'] = api('sprint-education')['data']
 	return json.dumps(suggestion)
 
