@@ -4,7 +4,6 @@ import json
 import base64
 from scrapy.crawler import CrawlerProcess
 
-
 REDIS_HOST = "sl-aus-syd-1-portal.3.dblayer.com"
 REDIS_PORT = 17556
 REDIS_PASSWORD = "BWJPNBCYZAZCAVPD"
@@ -35,7 +34,7 @@ class PaketSpider(scrapy.Spider):
 			links = response.css(".invest-reason a.btn")
 		else:
 			links = response.css(".product-filter-pane .click-here a.btn")
-			
+
 		jenis = response.url.split('/')[-2]
 		for a in links.css("a::attr(href)"):
 			self._save_list(jenis, a.get().split('/')[-1])
@@ -44,7 +43,7 @@ class PaketSpider(scrapy.Spider):
 	def parse_page(self, response):
 		links = "https://www.fwd.co.id"
 		title = response.css(".bread li.active::text").extract_first()
-		
+
 		image = response.css("div.img-bg::attr(style)").extract_first()
 		start = image.find("(")
 		end = image.find(")")
@@ -107,7 +106,7 @@ class PromoSpider(scrapy.Spider):
 		# Your spider definition
 	name = "promo-fwd"
 	start_urls=[
-		
+
 	]
 
 def api(name):
@@ -128,7 +127,7 @@ def api(name):
 
 def add_user(request):
 	data = request.form
-	user_id = r.get(data["id"]) 
+	user_id = r.get(data["id"])
 	if (user_id is not None):
 		return "User has been registered"
 
@@ -146,7 +145,7 @@ def add_user(request):
 
 	r.set(str(data["id"]), info)
 
-	return "success"
+    return "success"
 
 def get_user(user_id):
 
@@ -184,17 +183,22 @@ def suggest_package(user_id):
 	user = json.loads(user)
 
 	suggestion = {}
+    protect_package = api('family-term')['data']
+    invest_package = api('sprint-link-plus')['data']
+    promo_package = api('bebas-aksi')['data']
 	suggestion = {
-		'protect' : 'family-term', 
-		'invest' : 'link-plus', 
-		'promo' : 'bebas-aksi'
+		'protect' : protect_package,
+		'invest' : invest_package,
+		'promo' : promo_package
 		}
+    if user['jobClass'] == 'pelajar' and user['<7JT']:
+        suggestion['education'] = api('sprint-education')['data']
 	return json.dumps(suggestion)
 
 def _scrap():
 	process = CrawlerProcess({
 		'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
-	})	
+	})
 
 	process.crawl(PaketSpider)
 	process.start() # the script will block here until the crawling is finished
@@ -337,7 +341,7 @@ def export_packages_list(insurance):
 
 # def get_package_data(insurance,package):
 # 	_packages_key = insurance+'__packages'
-	
+
 # 	_package_name_key = _package_key+'__'+package
 # 	_package_features_key = _package_name_key+'__features'
 # 	_package_coverage_key = _package_name_key+'__coverage'
