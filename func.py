@@ -144,7 +144,7 @@ def add_user(request):
 	info = json.dumps(info)
 
 	r.set(str(data["id"]), info)
-	return "success"
+	return json.dumps({'status' : "ok"})
 
 def get_user(user_id):
 
@@ -172,7 +172,7 @@ def update_user(request):
 	data = json.dumps(data)
 	r.set(str(data_request["id"]), data)
 
-	return "success"
+	return json.dumps({'status' : 'OK'})
 
 def suggest_package(user_id):
 	user = r.get(user_id)
@@ -185,13 +185,18 @@ def suggest_package(user_id):
 	protect_package = api('family-term')['data']
 	invest_package = api('sprint-link-plus')['data']
 	promo_package = api('bebas-aksi')['data']
-	suggestion = {
-		'protect' : protect_package,
-		'invest' : invest_package,
-		'promo' : promo_package
-		}
+	promo_package['type'] = 'promo'
+	invest_package['type'] = 'invest'
+	protect_package['type'] = 'protect'
+	suggestion = [
+		protect_package,
+		invest_package,
+		promo_package
+		]
 	if user['jobClass'] == 'pelajar' and user['salaryClass'] == "<7JT":
-		suggestion['education'] = api('sprint-education')['data']
+		education_package = api('sprint-education')['data']
+		education_package['type'] = 'education'
+		suggestion.append(education_package)
 	return json.dumps(suggestion)
 
 def _scrap():
