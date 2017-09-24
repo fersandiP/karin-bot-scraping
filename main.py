@@ -32,6 +32,9 @@ def update_user():
 def get_user(user_id):
 	return func.get_user(user_id)
 
+@app.route('/package/<user_id>')
+def suggest_package(user_id):
+	return func.suggest_package(user_id)
 
 @app.route('/json-data', methods=['POST'])
 def json_data():

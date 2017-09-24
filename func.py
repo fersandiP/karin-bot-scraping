@@ -176,6 +176,21 @@ def update_user(request):
 
 	return "success"
 
+def suggest_package(user_id):
+	user = r.get(user_id)
+	if user is None:
+		return "User not found"
+	user = user.decode('utf-8')
+	user = json.loads(user)
+
+	suggestion = {}
+	suggestion = {
+		'protect' : 'family-term', 
+		'invest' : 'link-plus', 
+		'promo' : 'bebas-aksi'
+		}
+	return json.dumps(suggestion)
+
 def _scrap():
 	process = CrawlerProcess({
 		'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
