@@ -48,7 +48,7 @@ def json_insurance_packages(insurance):
 	app.logger.debug('packages '+insurance)
 	return func.export_packages_list(insurance)
 
-@app.route('/data/<insurance>/<package>')
+@app.route('/data/<insurance>/packages/<package>')
 def json_insurance_package_data(insurance,package):
 	return func.export_package_data(insurance,package)
 
