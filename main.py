@@ -20,17 +20,18 @@ def api_default():
 def api(paket):
 	return func.api(paket)
 
-@app.route('/add/user', methods=['POST'])
+@app.route('/user/add', methods=['POST'])
 def insert_user():
 	return func.add_user(request)
+
+@app.route('/user/update', methods=['POST'])
+def update_user():
+	return func.update_user(request)
 
 @app.route('/user/<user_id>')
 def get_user(user_id):
 	return func.get_user(user_id)
 
-@app.route('/user/update')
-def update_user():
-	return func.update_user(request)
 
 @app.route('/json-data', methods=['POST'])
 def json_data():

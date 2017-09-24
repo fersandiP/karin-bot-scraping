@@ -17,7 +17,7 @@ def login_redis():
 
 r = login_redis()
 
-class FwdSpider(scrapy.Spider):
+class PaketSpider(scrapy.Spider):
 		# Your spider definition
 	name = "fwd"
 	start_urls=[
@@ -44,6 +44,11 @@ class FwdSpider(scrapy.Spider):
 	def parse_page(self, response):
 		links = "https://www.fwd.co.id"
 		title = response.css(".bread li.active::text").extract_first()
+		
+		image = response.css("div.img-bg::attr(style)").extract_first()
+		start = image.find("(")
+		end = image.find(")")
+		image = links + image[start+2:end-1]
 
 		link = response.url
 		name = link.split("/")[-2]
@@ -85,7 +90,8 @@ class FwdSpider(scrapy.Spider):
 					"description" : description,
 					"features" : features,
 					"advantages" : advantages,
-					"brosur_link" : brosur_link
+					"brosur_link" : brosur_link,
+					"image" : image
 				}}
 		self._save_packet(name, data)
 
@@ -96,6 +102,13 @@ class FwdSpider(scrapy.Spider):
 	def _save_packet(self, name, data):
 		global r
 		r.set(name, json.dumps(data))
+
+class PromoSpider(scrapy.Spider):
+		# Your spider definition
+	name = "promo-fwd"
+	start_urls=[
+		
+	]
 
 def api(name):
 	global r
@@ -114,27 +127,29 @@ def api(name):
 		return r.get(name).decode("utf-8")
 
 def add_user(request):
-	user_id = r.get(request.data["id"]) 
+	data = request.form
+	user_id = r.get(data["id"]) 
 	if (user_id is not None):
 		return "User has been registered"
 
 	info = {}
 
-	for key,value in request.data:
+	for key in data:
 		if (key == "id"):
 			continue
-		info[key] = value
+		info[key] = data[key]
 
-	for key,value in request.files:
-		info[key] = base64.b64encode(value.read())
+	for key in request.files:
+		info[key] = str(base64.b64encode(request.files[key].read()))
 
 	info = json.dumps(info)
 
-	r.set(user_id, info)
+	r.set(str(data["id"]), info)
 
 	return "success"
 
 def get_user(user_id):
+
 	data = r.get(user_id)
 	if (data is None):
 		return "User not found"
@@ -142,28 +157,31 @@ def get_user(user_id):
 	return data.decode("utf-8")
 
 def update_user(request):
-	data = r.get(request.data['id'])
+	data_request = request.form
+	data = r.get(data_request['id'])
 	if (data is None):
 		return "User not found"
-	data = json.loads(data)
+	data = json.loads(data.decode('utf-8'))
 
-	for key,value in request.data:
+	for key in data_request:
 		if (key == "id"):
 			continue
-		data[key] = value
+		data[key] = data_request[key]
 
-	for key,value in request.files:
-		data[key] = base64.b64encode(value.read())
+	for key in request.files:
+		data[key] = str(base64.b64encode(request.files[key].read()))
+
+	data = json.dumps(data)
+	r.set(str(data_request["id"]), data)
 
 	return "success"
 
 def _scrap():
-	r.flushall()
 	process = CrawlerProcess({
 		'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
 	})	
 
-	process.crawl(FwdSpider)
+	process.crawl(PaketSpider)
 	process.start() # the script will block here until the crawling is finished
 	# process.join()
 	process.stop()
