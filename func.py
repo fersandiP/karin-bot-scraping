@@ -144,8 +144,7 @@ def add_user(request):
 	info = json.dumps(info)
 
 	r.set(str(data["id"]), info)
-
-    return "success"
+	return "success"
 
 def get_user(user_id):
 
